@@ -440,6 +440,36 @@ namespace Assembly.Projecto.Final.Services.Services
 
                 NotFoundException.When(foundedUser is null, $"{nameof(foundedUser)} não foi encontrado.");
 
+                if (foundedUser.EntityLink is not null)
+                {
+                    if (foundedUser.EntityLink.Account is not null)
+                    {
+                        _unitOfWork.AccountRepository.Delete(foundedUser.EntityLink.Account);
+                    }
+
+                    foreach (var contact in foundedUser.EntityLink.Contacts)
+                    {
+                        _unitOfWork.ContactRepository.Delete(contact);
+                    }
+
+                    foreach (var address in foundedUser.EntityLink.Addresses)
+                    {
+                        _unitOfWork.AddressRepository.Delete(address);
+                    }
+
+                    _unitOfWork.EntityLinkRepository.Delete(foundedUser.EntityLink);
+                }
+
+                foreach (var favorite in foundedUser.Favorites)
+                {
+                    _unitOfWork.FavoriteRepository.Delete(favorite);
+                }
+
+                foreach (var feedBack in foundedUser.FeedBacks)
+                {
+                    _unitOfWork.FeedBackRepository.Delete(feedBack);
+                }
+
                 deletedUser = _unitOfWork.UserRepository.Delete(foundedUser);
 
                 _unitOfWork.Commit();
