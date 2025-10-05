@@ -494,6 +494,12 @@ namespace Assembly.Projecto.Final.Services.Services
                         { 
                             _unitOfWork.ParticipantRepository.Delete(par);
                         }
+
+                        _unitOfWork.AppointmentRepository.Delete(appointment);
+                    }
+                    else if (participant.Role == ParticipantType.Participant)
+                    {
+                        _unitOfWork.ParticipantRepository.Delete(participant);
                     }
                 }
 
@@ -606,6 +612,12 @@ namespace Assembly.Projecto.Final.Services.Services
                         {
                             _unitOfWork.ParticipantRepository.Delete(par);
                         }
+
+                        _unitOfWork.AppointmentRepository.Delete(appointment);
+                    }
+                    else if (participant.Role == ParticipantType.Participant)
+                    {
+                        _unitOfWork.ParticipantRepository.Delete(participant);
                     }
                 }
 
