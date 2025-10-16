@@ -223,5 +223,12 @@ namespace Assembly.Projecto.Final.Services.Services
 
             return _mapper.Map<AppointmentAllDto>(appointment);
         }
+
+        public List<AppointmentAllDto> GetBetweenToDates(DateTime startDate, DateTime endDate)
+        {
+            var appointments = _unitOfWork.AppointmentRepository.GetBetweenToDates(startDate,endDate);
+
+            return _mapper.Map<List<AppointmentAllDto>>(appointments);
+        }
     }
 }

@@ -25,5 +25,11 @@ namespace Assembly.Projecto.Final.Data.EntityFramework.Repositories
         {
              return DbSet.Include(a => a.Participants).ToList();
         }
+
+        public List<Appointment> GetBetweenToDates(DateTime startDate, DateTime endDate)
+        {
+             return DbSet.Where(a => a.Date >= startDate && a.Date <= endDate)
+                         .Include(a => a.Participants).ToList();
+        }
     }
 }

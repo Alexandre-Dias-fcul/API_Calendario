@@ -17,5 +17,6 @@ namespace Assembly.Projecto.Final.Services.Interfaces
         public ParticipantDto DeleteParticipant(int appointmentId, int participantId);
         public AppointmentAllDto GetByIdWithParticipants(int id);
         public List<AppointmentAllDto> GetAllWithParticipants();
+        public List<AppointmentAllDto> GetBetweenToDates(DateTime startDate, DateTime endDate);
     }
 }
