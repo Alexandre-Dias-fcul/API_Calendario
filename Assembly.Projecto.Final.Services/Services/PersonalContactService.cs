@@ -134,7 +134,7 @@ namespace Assembly.Projecto.Final.Services.Services
         {
             using (_unitOfWork) 
             {
-                var personalContact = _unitOfWork.PersonalContactRepository.GetByIdWithDetail(personalContactDetailId);
+                var personalContact = _unitOfWork.PersonalContactRepository.GetByIdWithDetail(personalContactId);
 
                 NotFoundException.When(personalContact is null,$"{nameof(personalContact)} não foi encontrado.");
 
