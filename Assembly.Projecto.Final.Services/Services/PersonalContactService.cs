@@ -240,7 +240,7 @@ namespace Assembly.Projecto.Final.Services.Services
             using (_unitOfWork)
             {
 
-                var foundedPersonalContact = _unitOfWork.PersonalContactRepository.Delete(personalContactDto.Id);
+                var foundedPersonalContact = _unitOfWork.PersonalContactRepository.GetById(personalContactDto.Id);
 
                 NotFoundException.When(foundedPersonalContact is null,
                     $"{nameof(foundedPersonalContact)} não foi encontrado.");
