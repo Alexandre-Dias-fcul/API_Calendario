@@ -22,11 +22,11 @@ namespace Assembly.Projecto.Final.WebAPI.Extensions
             {
                 var context = services.GetRequiredService<ApplicationDbContext>();
 
-                context.Database.EnsureDeleted();
+                //context.Database.EnsureDeleted();
 
                 context.Database.Migrate();
 
-                SeedData(context);
+                //SeedData(context);
 
             }
             catch (Exception ex)

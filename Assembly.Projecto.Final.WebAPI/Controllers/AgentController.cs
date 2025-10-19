@@ -17,7 +17,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
             _agentService = agentService;
         }
 
-        [Authorize(Roles = "Manager,Broker,Admin")]
+        [Authorize(Roles = "Staff,Manager,Broker,Admin")]
         [HttpGet]
         public IEnumerable<AgentDto> GetAll()
         {
