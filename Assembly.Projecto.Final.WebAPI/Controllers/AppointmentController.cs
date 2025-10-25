@@ -111,7 +111,16 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
                 return BadRequest("Os ids do appointment não coincidem.");
             }
 
-            return Ok(_appointmentService.Update(appointmentDto));
+            string? employeeId = User.GetId();
+
+            if (employeeId == null)
+            {
+                return BadRequest("Não está autenticado como empregado.");
+            }
+
+            int employeeIdInt = int.Parse(employeeId);
+
+            return Ok(_appointmentService.Update(appointmentDto,employeeIdInt));
         }
 
         [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]

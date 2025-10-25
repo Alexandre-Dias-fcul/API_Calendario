@@ -13,6 +13,7 @@ namespace Assembly.Projecto.Final.Services.Interfaces
 {
     public interface IAppointmentService:IService<CreateAppointmentServiceDto,AppointmentDto,int>
     {
+        public AppointmentDto Update(AppointmentDto appointmentDto, int employeeId);
         public ParticipantDto AddParticipant(int appointmentId, int employeeId);
         public ParticipantDto DeleteParticipant(int appointmentId, int participantId);
         public AppointmentAllDto GetByIdWithParticipants(int id);

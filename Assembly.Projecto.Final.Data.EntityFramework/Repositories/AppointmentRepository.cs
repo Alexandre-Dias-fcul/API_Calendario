@@ -23,13 +23,19 @@ namespace Assembly.Projecto.Final.Data.EntityFramework.Repositories
 
         public List<Appointment> GetAllWithParticipants()
         {
-             return DbSet.Include(a => a.Participants).ToList();
+            return DbSet.Include(a => a.Participants).ToList();
         }
 
         public List<Appointment> GetBetweenToDates(DateTime startDate, DateTime endDate)
         {
-             return DbSet.Where(a => a.Date >= startDate && a.Date <= endDate)
-                         .Include(a => a.Participants).ToList();
+            return DbSet.Where(a => a.Date >= startDate && a.Date <= endDate)
+                        .Include(a => a.Participants).ToList();
+        }
+
+        public List<Appointment> GetAppointmentIntersections(DateTime date, TimeOnly hourStart, TimeOnly hourEnd)
+        {
+            return DbSet.Where(a => a.Date == date && a.HourStart < hourEnd && a.HourEnd > hourStart)
+                        .Include(a => a.Participants).ToList();
         }
     }
 }

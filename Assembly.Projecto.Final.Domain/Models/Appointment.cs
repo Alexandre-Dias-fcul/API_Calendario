@@ -75,6 +75,8 @@ namespace Assembly.Projecto.Final.Domain.Models
             DomainExceptionValidation.When(description == null,"Erro: a descrição é obrigatória.");
             DomainExceptionValidation.When(description != null && description.Length > 2000, " Erro: a descrição não " +
                 "pode ter mais de 2000 caracteres.");
+
+            DomainExceptionValidation.When(date < DateTime.Today, "Erro: a data tem de ser posterior à data atual.");
             DomainExceptionValidation.When(hourStart > hourEnd, "Erro: a hora de inicio não pode ser posterior à hora " +
                 "de fim.");
 

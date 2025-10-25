@@ -45,6 +45,17 @@ namespace Assembly.Projecto.Final.Services.Services
 
                 NotFoundException.When(employee is null, $"{nameof(employee)} não foi encontrado.");
 
+                var appointmentsConflict = _unitOfWork.AppointmentRepository
+                    .GetAppointmentIntersections(createAppointmentServiceDto.Date,
+                    createAppointmentServiceDto.HourStart, createAppointmentServiceDto.HourEnd);
+
+                foreach(var appointmentConflict in appointmentsConflict) 
+                {
+                    CustomApplicationException.When(appointmentConflict.Participants
+                        .Any(p => p.EmployeeId == employee.Id),
+                        $"O {nameof(employee)} já tem um appointment marcado para este horário.");
+                }
+                
                 var appointment = Appointment.Create(createAppointmentServiceDto.Title,
                     createAppointmentServiceDto.Description,
                     createAppointmentServiceDto.Date,
@@ -83,6 +94,16 @@ namespace Assembly.Projecto.Final.Services.Services
 
                 NotFoundException.When(appointment.Participants.Any(a => a.EmployeeId == employeeId),
                     $"O {nameof(employee)} já é participante deste appointment.");
+
+                var appointmentsConflict = _unitOfWork.AppointmentRepository
+                        .GetAppointmentIntersections(appointment.Date,appointment.HourStart, appointment.HourEnd);
+
+                foreach (var appointmentConflict in appointmentsConflict)
+                {
+                    CustomApplicationException.When(appointmentConflict.Participants
+                        .Any(p => p.EmployeeId == employee.Id),
+                         $"O {nameof(employee)} já tem um appointment marcado para este horário.");
+                }
 
                 var participant = Participant.Create(ParticipantType.Participant, appointment, employee);
 
@@ -189,7 +210,11 @@ namespace Assembly.Projecto.Final.Services.Services
             return _mapper.Map<AppointmentDto>(appointment);
         }
 
-        public AppointmentDto Update(AppointmentDto appointmentDto)
+        public AppointmentDto Update(AppointmentDto appointmentDto) 
+        {
+            throw new NotImplementedException();
+        }
+        public AppointmentDto Update(AppointmentDto appointmentDto,int employeeId)
         {
             Appointment updatedAppointment;
 
@@ -198,6 +223,29 @@ namespace Assembly.Projecto.Final.Services.Services
                 var foundedAppointment = _unitOfWork.AppointmentRepository.GetById(appointmentDto.Id);
 
                 NotFoundException.When(foundedAppointment is null, $"{nameof(foundedAppointment)} não foi encontrado.");
+
+                Employee employee = _unitOfWork.StaffRepository.GetById(employeeId);
+
+                if (employee == null)
+                {
+                    employee = _unitOfWork.AgentRepository.GetById(employeeId);
+                }
+
+                NotFoundException.When(employee is null, $"{nameof(employee)} não foi encontrado.");
+
+                var appointmentsConflict = _unitOfWork.AppointmentRepository
+                       .GetAppointmentIntersections(appointmentDto.Date, appointmentDto.HourStart,
+                       appointmentDto.HourEnd);
+
+                foreach (var appointmentConflict in appointmentsConflict)
+                {
+                    if (appointmentConflict.Id != foundedAppointment.Id)
+                    {
+                        CustomApplicationException.When(appointmentConflict.Participants
+                        .Any(p => p.EmployeeId == employee.Id),
+                         $"O {nameof(employee)} já tem um appointment marcado para este horário.");
+                    }
+                }
 
                 foundedAppointment.Update(appointmentDto.Title, appointmentDto.Description,
                     appointmentDto.Date, appointmentDto.HourStart,appointmentDto.HourEnd,
