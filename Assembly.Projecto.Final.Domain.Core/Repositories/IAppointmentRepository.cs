@@ -12,5 +12,6 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
         public List<Appointment> GetAllWithParticipants();
         public Appointment? GetByIdWithParticipants(int id);
         public List<Appointment> GetBetweenToDates(DateTime startDate, DateTime endDate);
+        public List<Appointment> GetAppointmentIntersections(DateTime date, TimeOnly hourStart, TimeOnly hourEnd);
     }
 }
