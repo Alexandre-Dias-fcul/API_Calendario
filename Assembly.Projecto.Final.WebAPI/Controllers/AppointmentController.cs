@@ -47,9 +47,16 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
         [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]
         [HttpGet("GetBetweenToDates/{startDate:DateTime}/{endDate:DateTime}")]
-        public ActionResult<AppointmentAllDto> GetBetWeenToDates(DateTime startDate,DateTime endDate)
+        public IEnumerable<AppointmentAllDto> GetBetWeenToDates(DateTime startDate, DateTime endDate)
         {
-            return Ok(_appointmentService.GetBetweenToDates(startDate,endDate));
+            return _appointmentService.GetBetweenToDates(startDate, endDate);
+        }
+
+        [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]
+        [HttpGet("GetAppointmentIntersections/{date:datetime}/{hourStart}/{hourEnd}")]
+        public IEnumerable<AppointmentAllDto> GetAppointmentIntersections( DateTime date,TimeOnly hourStart,TimeOnly hourEnd)
+        {
+            return _appointmentService.GetAppointmentIntersections(date,hourStart, hourEnd);
         }
 
         [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]

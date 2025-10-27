@@ -278,5 +278,12 @@ namespace Assembly.Projecto.Final.Services.Services
 
             return _mapper.Map<List<AppointmentAllDto>>(appointments);
         }
+
+        public List<AppointmentAllDto> GetAppointmentIntersections(DateTime date, TimeOnly hourStart, TimeOnly hourEnd)
+        {
+            var appointments = _unitOfWork.AppointmentRepository.GetAppointmentIntersections(date,hourStart,hourEnd);
+
+            return _mapper.Map<List<AppointmentAllDto>>(appointments);
+        }
     }
 }
