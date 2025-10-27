@@ -19,5 +19,6 @@ namespace Assembly.Projecto.Final.Services.Interfaces
         public AppointmentAllDto GetByIdWithParticipants(int id);
         public List<AppointmentAllDto> GetAllWithParticipants();
         public List<AppointmentAllDto> GetBetweenToDates(DateTime startDate, DateTime endDate);
+        public List<AppointmentAllDto> GetAppointmentIntersections(DateTime date, TimeOnly hourStart, TimeOnly hourEnd);
     }
 }
