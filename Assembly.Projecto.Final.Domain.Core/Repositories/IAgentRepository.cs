@@ -29,5 +29,9 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
         public Agent? GetByIdWithEverything(int id);
 
         public List<Agent> GetAllAdmins();
+
+        public List<Agent> GetAllPagination(int skip, int take, string search);
+
+        public int GetTotalCount(string search);
     }
 }
