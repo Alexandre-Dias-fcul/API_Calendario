@@ -3,6 +3,7 @@ using Assembly.Projecto.Final.Services.Dtos;
 using Assembly.Projecto.Final.Services.Dtos.GetDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
+using Assembly.Projecto.Final.Services.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,5 +29,6 @@ namespace Assembly.Projecto.Final.Services.Interfaces
         public AgentWithListingsDto GetByIdWithListings(int id);
         public AgentWithAgentsDto? GetByIdWithAgents(int id);
         public AgentDto GetByEmail(string email);
+        public Pagination<AgentDto> GetAllPagination(int skip, int take, string search);
     }
 }
