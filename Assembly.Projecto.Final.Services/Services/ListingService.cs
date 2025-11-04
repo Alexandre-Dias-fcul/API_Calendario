@@ -6,6 +6,7 @@ using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Exceptions;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -301,6 +302,18 @@ namespace Assembly.Projecto.Final.Services.Services
             }
 
             return _mapper.Map<ListingDto>(updatedListing);
+        }
+
+        public Pagination<ListingDto> GetAllPagination(int pageNumber, int pageSize, string search)
+        {
+            var totalCount = _unitOfWork.ListingRepository.GetTotalCount(search);
+
+            var listings = _unitOfWork.ListingRepository.GetAllPagination(pageNumber, pageSize, search);
+
+            var pagination = Pagination<ListingDto>.Create(_mapper.Map<List<ListingDto>>(listings),
+                pageNumber, pageSize, totalCount);
+
+            return pagination;
         }
     }
 }

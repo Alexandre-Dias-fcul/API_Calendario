@@ -3,6 +3,7 @@ using Assembly.Projecto.Final.Services.Dtos.GetDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
 using Assembly.Projecto.Final.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,14 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
         public IEnumerable<StaffDto> GetAll()
         {
             return _staffService.GetAll();
+        }
+
+        [Authorize(Roles = "Manager,Broker,Admin")]
+        [HttpGet("GetAllPagination/{pageNumber:int}/{pageSize:int}")]
+        public Pagination<StaffDto> GetAllPagination([FromRoute] int pageNumber, [FromRoute] int pageSize,
+                                             [FromQuery] string? search)
+        {
+            return _staffService.GetAllPagination(pageNumber, pageSize, search);
         }
 
         [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]

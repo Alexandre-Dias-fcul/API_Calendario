@@ -30,7 +30,7 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
 
         public List<Agent> GetAllAdmins();
 
-        public List<Agent> GetAllPagination(int skip, int take, string search);
+        public List<Agent> GetAllPagination(int pageNumber, int pageSize, string search);
 
         public int GetTotalCount(string search);
     }
