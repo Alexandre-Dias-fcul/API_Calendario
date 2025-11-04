@@ -80,5 +80,25 @@ namespace Assembly.Projecto.Final.Data.EntityFramework.Repositories
                    .ThenInclude(el => el.Addresses)
                    .FirstOrDefault(s => s.Id == id);
         }
+
+        public List<Staff> GetAllPagination(int pageNumber, int pageSize, string search)
+        {
+            return DbSet
+                .Where(a => string.IsNullOrEmpty(search) ||
+                            a.Name.FirstName.Contains(search) ||
+                            a.Name.LastName.Contains(search))
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public int GetTotalCount(string search)
+        {
+            return DbSet
+                 .Where(a => string.IsNullOrEmpty(search) ||
+                             a.Name.FirstName.Contains(search) ||
+                             a.Name.LastName.Contains(search))
+                 .Count();
+        }
     }
 }

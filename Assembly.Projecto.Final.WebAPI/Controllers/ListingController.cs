@@ -1,6 +1,8 @@
 ﻿using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
+using Assembly.Projecto.Final.Services.Services;
 using Assembly.Projecto.Final.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +23,14 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
         public IEnumerable<ListingDto> GetAll() 
         {
             return _listingService.GetAll();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("GetAllPagination/{pageNumber:int}/{pageSize:int}")]
+        public Pagination<ListingDto> GetAllPagination([FromRoute] int pageNumber, [FromRoute] int pageSize,
+                                             [FromQuery] string? search)
+        {
+            return _listingService.GetAllPagination(pageNumber, pageSize, search);
         }
 
         [AllowAnonymous]

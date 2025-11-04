@@ -30,7 +30,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
         public Pagination<AgentDto> GetAllPagination([FromRoute]int pageNumber, [FromRoute]int pageSize,
                                              [FromQuery] string? search)
         {
-            return _agentService.GetAllPagination((pageNumber-1)*pageSize, pageSize, search);
+            return _agentService.GetAllPagination(pageNumber, pageSize, search);
         }
 
         [AllowAnonymous]

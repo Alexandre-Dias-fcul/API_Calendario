@@ -29,6 +29,6 @@ namespace Assembly.Projecto.Final.Services.Interfaces
         public AgentWithListingsDto GetByIdWithListings(int id);
         public AgentWithAgentsDto? GetByIdWithAgents(int id);
         public AgentDto GetByEmail(string email);
-        public Pagination<AgentDto> GetAllPagination(int skip, int take, string search);
+        public Pagination<AgentDto> GetAllPagination(int pageNumber, int pageSize, string search);
     }
 }
