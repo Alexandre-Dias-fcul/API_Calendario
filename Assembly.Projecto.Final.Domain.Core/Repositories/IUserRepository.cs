@@ -18,5 +18,9 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
         public User? GetByIdWithAll(int id);
 
         public User? GetByIdWithEverything(int id);
+
+        public List<User> GetAllPagination(int pageNumber, int pageSize, string search);
+
+        public int GetTotalCount(string search);
     }
 }
