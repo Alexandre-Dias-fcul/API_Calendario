@@ -15,5 +15,11 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
 
        public int GetTotalCount(string search);
 
+        public List<Listing> GetListingsPaginationByAgentId(int agentId, int pageNumber, int pageSize,
+             string search);
+        public int GetTotalCount(int agentId, string search);
+
+        public List<Listing> GetAllSearch(string search);
+
     }
 }

@@ -315,5 +315,24 @@ namespace Assembly.Projecto.Final.Services.Services
 
             return pagination;
         }
+
+        public Pagination<ListingDto> GetListingsPaginationByAgentId(int agentId, int pageNumber, int pageSize, string search)
+        {
+            var totalCount = _unitOfWork.ListingRepository.GetTotalCount(agentId,search);
+
+            var listings = _unitOfWork.ListingRepository.GetListingsPaginationByAgentId(agentId,pageNumber, pageSize, search);
+
+            var pagination = Pagination<ListingDto>.Create(_mapper.Map<List<ListingDto>>(listings),
+                pageNumber, pageSize, totalCount);
+
+            return pagination;
+        }
+
+        public List<ListingDto> GetAllSearch(string search)
+        {
+            var listings = _unitOfWork.ListingRepository.GetAllSearch(search);
+
+            return _mapper.Map<List<ListingDto>>(listings);
+        }
     }
 }
