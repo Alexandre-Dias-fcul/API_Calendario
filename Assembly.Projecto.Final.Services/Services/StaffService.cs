@@ -7,6 +7,7 @@ using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Exceptions;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System;
@@ -603,6 +604,18 @@ namespace Assembly.Projecto.Final.Services.Services
             var staff = _unitOfWork.StaffRepository.GetById(employeeId);
 
             return _mapper.Map<StaffDto>(staff);
+        }
+
+        public Pagination<StaffDto> GetAllPagination(int pageNumber, int pageSize, string search)
+        {
+            var totalCount = _unitOfWork.StaffRepository.GetTotalCount(search);
+
+            var staff = _unitOfWork.StaffRepository.GetAllPagination(pageNumber, pageSize, search);
+
+            var pagination = Pagination<StaffDto>.Create(_mapper.Map<List<StaffDto>>(staff),
+                pageNumber, pageSize, totalCount);
+
+            return pagination;
         }
     }
 }

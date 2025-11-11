@@ -1,6 +1,9 @@
-﻿using Assembly.Projecto.Final.Services.Dtos.GetDtos;
+﻿using Assembly.Projecto.Final.Domain.Models;
+using Assembly.Projecto.Final.Services.Dtos.GetDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
+using Assembly.Projecto.Final.Services.Services;
 using Assembly.Projecto.Final.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +24,14 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
         public IEnumerable<PersonalContactDto> GetAll() 
         {
             return _personalContactService.GetAll();
+        }
+
+        [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]
+        [HttpGet("GetPersonalContactPaginationByEmployeeId/{employeeId:int}/{pageNumber:int}/{pageSize:int}")]
+        public Pagination<PersonalContact> GetPersonalContactPaginationByEmployeeId([FromRoute] int employeeId,
+            [FromRoute] int pageNumber, [FromRoute] int pageSize, [FromQuery] string? search)
+        {
+            return _personalContactService.GetPersonalContactPaginationByEmployeeId(employeeId, pageNumber, pageSize, search);
         }
 
         [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]

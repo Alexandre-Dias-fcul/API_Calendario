@@ -2,6 +2,7 @@
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
 using Assembly.Projecto.Final.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,19 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
         [Authorize(Roles = "Admin")]
+        [HttpGet]
         public IEnumerable<UserDto> GetAll()
         {
             return _userService.GetAll();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetAllPagination/{pageNumber:int}/{pageSize:int}")]
+        public Pagination<UserDto> GetAllPagination([FromRoute] int pageNumber, [FromRoute] int pageSize,
+                                             [FromQuery] string? search)
+        {
+            return _userService.GetAllPagination(pageNumber, pageSize, search);
         }
 
         [AllowAnonymous]

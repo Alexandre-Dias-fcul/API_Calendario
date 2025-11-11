@@ -10,6 +10,16 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
     public interface IListingRepository:IRepository<Listing,int>
     {
        public Listing? GetByIdWithAll(int id);
-       
+
+       public List<Listing> GetAllPagination(int pageNumber, int pageSize, string search);
+
+       public int GetTotalCount(string search);
+
+        public List<Listing> GetListingsPaginationByAgentId(int agentId, int pageNumber, int pageSize,
+             string search);
+        public int GetTotalCount(int agentId, string search);
+
+        public List<Listing> GetAllSearch(string search);
+
     }
 }

@@ -22,5 +22,9 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
         public Staff? GetByIdWithParticipants(int id);
 
         public Staff? GetByIdWithEverything(int id);
+
+        public List<Staff> GetAllPagination(int pageNumber, int pageSize, string search);
+
+        public int GetTotalCount(string search);
     }
 }

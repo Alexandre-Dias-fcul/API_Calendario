@@ -1,6 +1,7 @@
 ﻿using Assembly.Projecto.Final.Domain.Models;
 using Assembly.Projecto.Final.Services.Dtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
+using Assembly.Projecto.Final.Services.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,9 @@ namespace Assembly.Projecto.Final.Services.Interfaces
         public ReassignDto SelfReassignTo(int listingId, int newAgentId);
         public ReassignDto SelfReassign(int listingId,int newAgentId);
         public ReassignDto BetweenReassign(int listingId, int newAgentId);
+        public Pagination<ListingDto> GetAllPagination(int pageNumber, int pageSize, string search);
+        public Pagination<ListingDto> GetListingsPaginationByAgentId(int agentId, int pageNumber, int pageSize,
+             string search);
+        public List<ListingDto> GetAllSearch(string search);
     }
 }

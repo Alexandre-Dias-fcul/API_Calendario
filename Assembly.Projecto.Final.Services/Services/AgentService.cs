@@ -8,6 +8,7 @@ using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Exceptions;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -747,6 +748,18 @@ namespace Assembly.Projecto.Final.Services.Services
             var agent = _unitOfWork.AgentRepository.GetById(employeeId);
 
             return _mapper.Map<AgentDto>(agent);
+        }
+
+        public Pagination<AgentDto> GetAllPagination(int pageNumber, int pageSize, string search)
+        {
+            var totalCount = _unitOfWork.AgentRepository.GetTotalCount(search);
+
+            var agents = _unitOfWork.AgentRepository.GetAllPagination(pageNumber,pageSize, search);
+
+            var pagination = Pagination<AgentDto>.Create(_mapper.Map<List<AgentDto>>(agents),
+                pageNumber,pageSize, totalCount);
+
+            return pagination;
         }
     }
 }

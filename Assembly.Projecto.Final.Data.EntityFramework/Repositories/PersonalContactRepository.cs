@@ -20,5 +20,22 @@ namespace Assembly.Projecto.Final.Data.EntityFramework.Repositories
         {
             return DbSet.Include(p => p.PersonalContactDetails).FirstOrDefault(p => p.Id == id);
         }
+
+        public List<PersonalContact> GetPersonalContactPaginationByEmployeeId(int employeeId, int pageNumber, int pageSize,
+            string search)
+        {
+            return DbSet
+                   .Where(p => p.EmployeeId == employeeId && (string.IsNullOrEmpty(search) || p.Name.Contains(search)))
+                   .Skip((pageNumber - 1) * pageSize)
+                   .Take(pageSize)
+                   .ToList();
+        }
+
+        public int GetTotalCount(int employeeId, string search)
+        {
+            return DbSet
+                   .Where(p => p.EmployeeId == employeeId && (string.IsNullOrEmpty(search) || p.Name.Contains(search)))
+                   .Count();
+        }
     }
 }

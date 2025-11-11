@@ -99,5 +99,25 @@ namespace Assembly.Projecto.Final.Data.EntityFramework.Repositories
         {
             return DbSet.Where(a => a.Role == RoleType.Admin).ToList();
         }
+
+        public List<Agent> GetAllPagination(int pageNumber, int pageSize, string search)
+        {
+            return DbSet
+                .Where(a => string.IsNullOrEmpty(search) ||
+                            a.Name.FirstName.Contains(search) ||
+                            a.Name.LastName.Contains(search))
+                .Skip((pageNumber-1)*pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public int GetTotalCount(string search)
+        {
+            return DbSet
+                .Where(a => string.IsNullOrEmpty(search) ||
+                            a.Name.FirstName.Contains(search) ||
+                            a.Name.LastName.Contains(search))
+                .Count();
+        }
     }
 }
