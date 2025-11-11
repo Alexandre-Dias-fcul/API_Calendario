@@ -1,7 +1,10 @@
 ﻿using Assembly.Projecto.Final.Domain.Enums;
 using Assembly.Projecto.Final.Services.Dtos.GetDtos;
+using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
+using Assembly.Projecto.Final.Services.Services;
 using Assembly.Projecto.Final.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +24,14 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
         public IEnumerable<AppointmentDto> GetAll()
         {
             return _appointmentService.GetAll();
+        }
+
+        [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]
+        [HttpGet("GetAppointmentsPaginationByEmployeeId/{employeeId:int}/{pageNumber:int}/{pageSize:int}")]
+        public Pagination<AppointmentAllDto> GetAppointmentsPaginationByEmployeeId([FromRoute]int employeeId,
+            [FromRoute] int pageNumber, [FromRoute] int pageSize,[FromQuery] string? search)
+        {
+            return _appointmentService.GetAppointmentsPaginationByEmployeeId(employeeId, pageNumber, pageSize, search);
         }
 
         [Authorize(Roles = "Staff,Agent,Manager,Broker,Admin")]

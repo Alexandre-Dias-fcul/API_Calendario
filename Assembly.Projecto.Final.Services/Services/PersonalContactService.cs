@@ -6,6 +6,7 @@ using Assembly.Projecto.Final.Services.Dtos.GetDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Exceptions;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -254,6 +255,20 @@ namespace Assembly.Projecto.Final.Services.Services
             }
 
             return _mapper.Map<PersonalContactDto>(updatedPersonalContact);
+        }
+
+        public Pagination<PersonalContact> GetPersonalContactPaginationByEmployeeId(int employeeId, int pageNumber, int pageSize,
+            string search)
+        {
+            var totalCount = _unitOfWork.PersonalContactRepository.GetTotalCount(employeeId, search);
+
+            var appointments = _unitOfWork.PersonalContactRepository
+                   .GetPersonalContactPaginationByEmployeeId(employeeId, pageNumber, pageSize, search);
+
+            var pagination = Pagination<PersonalContact>.Create(_mapper.Map<List<PersonalContact>>(appointments),
+                pageNumber, pageSize, totalCount);
+
+            return pagination;
         }
     }
 }

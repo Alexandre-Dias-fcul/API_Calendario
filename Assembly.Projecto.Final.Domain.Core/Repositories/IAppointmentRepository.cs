@@ -13,5 +13,8 @@ namespace Assembly.Projecto.Final.Domain.Core.Repositories
         public Appointment? GetByIdWithParticipants(int id);
         public List<Appointment> GetBetweenToDates(DateTime startDate, DateTime endDate);
         public List<Appointment> GetAppointmentIntersections(DateTime date, TimeOnly hourStart, TimeOnly hourEnd);
+        public List<Appointment> GetAppointmentsPaginationByEmployeeId(int employeeId, int pageNumber, int pageSize,
+            string search);
+        public int GetTotalCount(int employeeId, string search);
     }
 }

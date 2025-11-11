@@ -3,9 +3,11 @@ using Assembly.Projecto.Final.Domain.Core.Repositories;
 using Assembly.Projecto.Final.Domain.Enums;
 using Assembly.Projecto.Final.Domain.Models;
 using Assembly.Projecto.Final.Services.Dtos.GetDtos;
+using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Exceptions;
 using Assembly.Projecto.Final.Services.Interfaces;
+using Assembly.Projecto.Final.Services.Pagination;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -284,6 +286,20 @@ namespace Assembly.Projecto.Final.Services.Services
             var appointments = _unitOfWork.AppointmentRepository.GetAppointmentIntersections(date,hourStart,hourEnd);
 
             return _mapper.Map<List<AppointmentAllDto>>(appointments);
+        }
+
+        public Pagination<AppointmentAllDto> GetAppointmentsPaginationByEmployeeId(int employeeId, int pageNumber, int pageSize,
+            string search)
+        {
+            var totalCount = _unitOfWork.AppointmentRepository.GetTotalCount(employeeId, search);
+
+            var appointments = _unitOfWork.AppointmentRepository
+                   .GetAppointmentsPaginationByEmployeeId(employeeId, pageNumber, pageSize, search);
+
+            var pagination = Pagination<AppointmentAllDto>.Create(_mapper.Map<List<AppointmentAllDto>>(appointments),
+                pageNumber, pageSize, totalCount);
+
+            return pagination;
         }
     }
 }
