@@ -16,5 +16,8 @@ namespace Assembly.Projecto.Final.Services.Interfaces
         public ReassignDto SelfReassign(int listingId,int newAgentId);
         public ReassignDto BetweenReassign(int listingId, int newAgentId);
         public Pagination<ListingDto> GetAllPagination(int pageNumber, int pageSize, string search);
+        public Pagination<ListingDto> GetListingsPaginationByAgentId(int agentId, int pageNumber, int pageSize,
+             string search);
+        public List<ListingDto> GetAllSearch(string search);
     }
 }

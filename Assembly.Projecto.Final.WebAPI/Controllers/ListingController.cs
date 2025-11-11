@@ -26,11 +26,26 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("GetAllSearch")]
+        public IEnumerable<ListingDto> GetAllSearch([FromQuery] string? search)
+        {
+            return _listingService.GetAllSearch(search);
+        }
+
+        [Authorize(Roles = "Agent,Manager,Broker,Admin")]
         [HttpGet("GetAllPagination/{pageNumber:int}/{pageSize:int}")]
         public Pagination<ListingDto> GetAllPagination([FromRoute] int pageNumber, [FromRoute] int pageSize,
                                              [FromQuery] string? search)
         {
             return _listingService.GetAllPagination(pageNumber, pageSize, search);
+        }
+
+        [Authorize(Roles = "Agent,Manager,Broker,Admin")]
+        [HttpGet("GetListingsPaginationByAgentId/{agentId:int}/{pageNumber:int}/{pageSize:int}")]
+        public Pagination<ListingDto> GetListingsPaginationByAgentId([FromRoute]int agentId,[FromRoute] int pageNumber, 
+            [FromRoute] int pageSize,[FromQuery] string? search)
+        {
+            return _listingService.GetListingsPaginationByAgentId(agentId,pageNumber, pageSize, search);
         }
 
         [AllowAnonymous]

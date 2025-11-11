@@ -47,5 +47,28 @@ namespace Assembly.Projecto.Final.Data.EntityFramework.Repositories
                             l.Type.Contains(search) ||
                             l.Type.Contains(search)).Count();
         }
+
+        public List<Listing> GetListingsPaginationByAgentId(int agentId, int pageNumber, int pageSize,
+            string search)
+        {
+            return DbSet
+                   .Where(l => l.AgentId == agentId && (string.IsNullOrEmpty(search) || l.Type.Contains(search)))
+                   .Skip((pageNumber - 1) * pageSize)
+                   .Take(pageSize)
+                   .ToList();
+        }
+
+        public int GetTotalCount(int agentId, string search)
+        {
+            return DbSet
+                   .Where(l => l.AgentId == agentId && (string.IsNullOrEmpty(search) || l.Type.Contains(search)))
+                   .Count();
+        }
+
+        public List<Listing> GetAllSearch(string search)
+        {
+            return DbSet.Where(l => string.IsNullOrEmpty(search) ||l.Type.Contains(search))
+                .ToList();
+        }
     }
 }
