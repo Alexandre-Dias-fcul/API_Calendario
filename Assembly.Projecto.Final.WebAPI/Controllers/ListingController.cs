@@ -6,16 +6,20 @@ using Assembly.Projecto.Final.Services.Services;
 using Assembly.Projecto.Final.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Assembly.Projecto.Final.WebAPI.Controllers
 {
     public class ListingController:BaseController
     {
         private readonly IListingService _listingService;
+        private readonly IWebHostEnvironment _env;
 
-        public ListingController(IListingService listingService) 
+        public ListingController(IListingService listingService, IWebHostEnvironment env) 
         {
             _listingService = listingService;
+            _env = env;
         }
 
         [AllowAnonymous]
@@ -57,7 +61,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
         [Authorize(Roles = "Agent,Manager,Broker,Admin")]
         [HttpPost]
-        public ActionResult<ListingDto> Add([FromBody] CreateListingDto createListingDto) 
+        public async Task<ActionResult<ListingDto>> Add([FromForm] CreateListingDto createListingDto) 
         {
             string? id = User.GetId();
 
@@ -68,24 +72,52 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
             int agentId = int.Parse(id);
 
-            CreateListingServiceDto createListingServiceDto = new()
-            {
-                Type = createListingDto.Type,
-                Status = createListingDto.Status,
-                NumberOfRooms = createListingDto.NumberOfRooms,
-                NumberOfKitchens = createListingDto.NumberOfKitchens,
-                NumberOfBathrooms = createListingDto.NumberOfBathrooms,
-                Price = createListingDto.Price,
-                Location = createListingDto.Location,
-                Area = createListingDto.Area,
-                Parking = createListingDto.Parking,
-                Description = createListingDto.Description,
-                MainImageFileName = createListingDto.MainImageFileName,
-                OtherImagesFileNames = createListingDto.OtherImagesFileNames,
-                AgentId = agentId
-            };
+            if(createListingDto.Image == null) 
+            { 
+                return BadRequest("Imagem principal é obrigatória.");
+            }
 
-            return Ok(_listingService.Add(createListingServiceDto));
+            try 
+            { 
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images/listings");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(createListingDto.Image.FileName)}";
+
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await createListingDto.Image.CopyToAsync(fileStream);
+                }
+
+                CreateListingServiceDto createListingServiceDto = new()
+                {
+                    Type = createListingDto.Type,
+                    Status = createListingDto.Status,
+                    NumberOfRooms = createListingDto.NumberOfRooms,
+                    NumberOfKitchens = createListingDto.NumberOfKitchens,
+                    NumberOfBathrooms = createListingDto.NumberOfBathrooms,
+                    Price = createListingDto.Price,
+                    Location = createListingDto.Location,
+                    Area = createListingDto.Area,
+                    Parking = createListingDto.Parking,
+                    Description = createListingDto.Description,
+                    MainImageFileName = $"images/listings/{uniqueFileName}",
+                    OtherImagesFileNames = createListingDto.OtherImagesFileNames,
+                    AgentId = agentId
+                };
+
+                return Ok(_listingService.Add(createListingServiceDto));
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest("Erro ao carregar a imagem: " + ex.Message);
+            }
         }
 
         [Authorize(Roles = "Manager,Broker,Admin")]
