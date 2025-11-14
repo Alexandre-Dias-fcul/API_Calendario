@@ -20,8 +20,8 @@ namespace Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos
         public double Area { get; set; }
         public int? Parking { get; set; }
         public string Description { get; set; }
-        public IFormFile Image { get; set; }
-        public string OtherImagesFileNames { get; set; }
+        public IFormFile? Image { get; set; }
+        public IFormFile? SecondaryImage { get; set; }
         
     }
 }
