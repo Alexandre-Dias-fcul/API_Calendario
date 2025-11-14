@@ -77,6 +77,11 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
                 return BadRequest("Imagem principal é obrigatória.");
             }
 
+            if (createListingDto.SecondaryImage == null)
+            {
+                return BadRequest("A segunda imagem é obrigatória.");
+            }
+
             try 
             { 
                 string uploadsFolder = Path.Combine(_env.WebRootPath, "images/listings");
@@ -86,7 +91,11 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(createListingDto.Image.FileName)}";
+                var originalName = Path.GetFileNameWithoutExtension(createListingDto.Image.FileName);
+
+                var extension = Path.GetExtension(createListingDto.Image.FileName);
+
+                var uniqueFileName = $"{Guid.NewGuid()}{originalName}{extension}";
 
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -95,9 +104,23 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
                     await createListingDto.Image.CopyToAsync(fileStream);
                 }
 
+                var secondaryOriginalName = Path.GetFileNameWithoutExtension(createListingDto.SecondaryImage.FileName);
+
+                var secondaryExtension = Path.GetExtension(createListingDto.SecondaryImage.FileName);
+
+                var secondaryUniqueFileName = $"{Guid.NewGuid()}{secondaryOriginalName}{secondaryExtension}";
+
+                var secondaryImagePath = Path.Combine(uploadsFolder, secondaryUniqueFileName);
+
+                using (var fileStream = new FileStream(secondaryImagePath, FileMode.Create))
+                {
+                    await createListingDto.SecondaryImage.CopyToAsync(fileStream);
+                }
+
                 CreateListingServiceDto createListingServiceDto = new()
                 {
-                    Type = createListingDto.Type,
+                    Type =
+                    createListingDto.Type,
                     Status = createListingDto.Status,
                     NumberOfRooms = createListingDto.NumberOfRooms,
                     NumberOfKitchens = createListingDto.NumberOfKitchens,
@@ -108,7 +131,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
                     Parking = createListingDto.Parking,
                     Description = createListingDto.Description,
                     MainImageFileName = $"images/listings/{uniqueFileName}",
-                    OtherImagesFileNames = createListingDto.OtherImagesFileNames,
+                    OtherImagesFileNames = $"images/listings/{secondaryUniqueFileName}",
                     AgentId = agentId
                 };
 
@@ -152,21 +175,150 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
         [Authorize(Roles = "Agent,Manager,Broker,Admin")]
         [HttpPut("{id:int}")]
-        public ActionResult<ListingDto> Update([FromRoute] int id,[FromBody] ListingDto listingDto) 
+        public async Task<ActionResult<ListingDto>> Update([FromRoute] int id, [FromForm] CreateListingDto createListingDto) 
         {
-            if(id != listingDto.Id) 
+            try 
             {
-                return BadRequest("Os ids da listing não coincidem.");   
-            }
+                var listing = _listingService.GetById(id);
 
-            return Ok(_listingService.Update(listingDto));
+                if (listing == null) 
+                {
+                    return NotFound("Listing não encontrada.");
+                }
+
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images/listings");
+
+                if (!Directory.Exists(uploadsFolder)) 
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                if (createListingDto.Image != null)
+                {
+      
+                    if (!string.IsNullOrEmpty(listing.MainImageFileName))
+                    {
+                        string oldPath = Path.Combine(_env.WebRootPath, listing.MainImageFileName);
+
+                        if (System.IO.File.Exists(oldPath)) 
+                        {
+                            System.IO.File.Delete(oldPath);
+                        }
+                            
+                    }
+
+                    var originalName = Path.GetFileNameWithoutExtension(createListingDto.Image.FileName);
+
+                    var extension = Path.GetExtension(createListingDto.Image.FileName);
+
+                    var uniqueFileName = $"{Guid.NewGuid()}{originalName}{extension}";
+
+                    string newPath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(newPath, FileMode.Create))
+                    {
+                        await createListingDto.Image.CopyToAsync(stream);
+                    }
+
+                    listing.MainImageFileName = $"images/listings/{uniqueFileName}";
+                }
+
+                if (createListingDto.SecondaryImage != null)
+                {
+                    if (!string.IsNullOrEmpty(listing.OtherImagesFileNames))
+                    {
+                        string oldPath = Path.Combine(_env.WebRootPath, listing.OtherImagesFileNames);
+
+                        if (System.IO.File.Exists(oldPath)) 
+                        {
+                            System.IO.File.Delete(oldPath);
+                        }
+                            
+                    }
+
+                    var originalName = Path.GetFileNameWithoutExtension(createListingDto.SecondaryImage.FileName);
+
+                    var extension = Path.GetExtension(createListingDto.SecondaryImage.FileName);
+
+                    var uniqueFileName = $"{Guid.NewGuid()}{originalName}{extension}";
+
+                    string newPath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(newPath, FileMode.Create))
+                    {
+                        await createListingDto.SecondaryImage.CopyToAsync(stream);
+                    }
+
+                    listing.OtherImagesFileNames = $"images/listings/{uniqueFileName}";
+                }
+
+                ListingDto listingDto = new()
+                {
+                    Id = id,
+                    Type = createListingDto.Type,
+                    Status = createListingDto.Status,
+                    NumberOfRooms = createListingDto.NumberOfRooms,
+                    NumberOfKitchens = createListingDto.NumberOfKitchens,
+                    NumberOfBathrooms = createListingDto.NumberOfBathrooms,
+                    Price = createListingDto.Price,
+                    Location = createListingDto.Location,
+                    Area = createListingDto.Area,
+                    Parking = createListingDto.Parking,
+                    Description = createListingDto.Description,
+                    MainImageFileName = listing.MainImageFileName,
+                    OtherImagesFileNames = listing.OtherImagesFileNames
+                };
+
+                return Ok(_listingService.Update(listingDto));
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest("Erro ao atualizar listing: " + ex.Message);
+            }
         }
 
         [Authorize(Roles = "Agent,Manager,Broker,Admin")]
         [HttpDelete("{id:int}")]
         public ActionResult<ListingDto> Delete(int id)
         {
-            return Ok(_listingService.Delete(id));
+            try
+            {
+                var listing = _listingService.GetById(id);
+
+                if (listing == null)
+                {
+                    return NotFound("Listing não encontrada.");
+                }
+
+                if (!string.IsNullOrEmpty(listing.MainImageFileName))
+                {
+                    string mainImagePath = Path.Combine(_env.WebRootPath, listing.MainImageFileName);
+
+                    if (System.IO.File.Exists(mainImagePath))
+                    {
+                        System.IO.File.Delete(mainImagePath);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(listing.OtherImagesFileNames))
+                {
+                    string secondaryImagePath = Path.Combine(_env.WebRootPath, listing.OtherImagesFileNames);
+
+                    if (System.IO.File.Exists(secondaryImagePath))
+                    {
+                        System.IO.File.Delete(secondaryImagePath);
+                    }
+                }
+
+                return Ok(_listingService.Delete(id));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Erro ao deletar listing: " + ex.Message);
+            }
+            
         }
     }
 }
