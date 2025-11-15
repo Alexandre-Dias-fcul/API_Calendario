@@ -95,7 +95,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
                 var extension = Path.GetExtension(createListingDto.Image.FileName);
 
-                var uniqueFileName = $"{Guid.NewGuid()}{originalName}{extension}";
+                var uniqueFileName = $"{Guid.NewGuid()}_{originalName}{extension}";
 
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -108,7 +108,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
                 var secondaryExtension = Path.GetExtension(createListingDto.SecondaryImage.FileName);
 
-                var secondaryUniqueFileName = $"{Guid.NewGuid()}{secondaryOriginalName}{secondaryExtension}";
+                var secondaryUniqueFileName = $"{Guid.NewGuid()}_{secondaryOriginalName}{secondaryExtension}";
 
                 var secondaryImagePath = Path.Combine(uploadsFolder, secondaryUniqueFileName);
 
@@ -211,7 +211,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
                     var extension = Path.GetExtension(createListingDto.Image.FileName);
 
-                    var uniqueFileName = $"{Guid.NewGuid()}{originalName}{extension}";
+                    var uniqueFileName = $"{Guid.NewGuid()}_{originalName}{extension}";
 
                     string newPath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -240,7 +240,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
                     var extension = Path.GetExtension(createListingDto.SecondaryImage.FileName);
 
-                    var uniqueFileName = $"{Guid.NewGuid()}{originalName}{extension}";
+                    var uniqueFileName = $"{Guid.NewGuid()}_{originalName}{extension}";
 
                     string newPath = Path.Combine(uploadsFolder, uniqueFileName);
 
