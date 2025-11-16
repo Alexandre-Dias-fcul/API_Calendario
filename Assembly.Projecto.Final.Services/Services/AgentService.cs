@@ -264,7 +264,13 @@ namespace Assembly.Projecto.Final.Services.Services
 
                 NotFoundException.When(address is null, "O address não existe.");
 
-                if(address.Street != addressDto.Street || address.City != addressDto.City 
+                var exists = agent.EntityLink.Addresses.Any(address => address.Street == addressDto.Street &&
+                            address.City == addressDto.City && address.Country == addressDto.Country &&
+                            address.PostalCode == addressDto.PostalCode);
+
+                NotFoundException.When(exists, "Este endereço já existe.");
+
+                if (address.Street != addressDto.Street || address.City != addressDto.City 
                      || address.Country != addressDto.Country || address.PostalCode != addressDto.PostalCode) 
                 {
                     agent.EntityLink.Addresses.FirstOrDefault(a => a.Id == addressDto.Id).
@@ -298,6 +304,11 @@ namespace Assembly.Projecto.Final.Services.Services
                 var contacto = agent.EntityLink.Contacts.FirstOrDefault(c => c.Id == contactDto.Id);
 
                 NotFoundException.When(contacto is null, "O contacto não existe.");
+
+                var exists = agent.EntityLink.Contacts.Any(contact =>
+                   contact.ContactType == contactDto.ContactType && contact.Value == contactDto.Value);
+
+                CustomApplicationException.When(exists, "Este contacto já existe.");
 
                 if (contacto.ContactType != contactDto.ContactType || contacto.Value != contactDto.Value) 
                 {
