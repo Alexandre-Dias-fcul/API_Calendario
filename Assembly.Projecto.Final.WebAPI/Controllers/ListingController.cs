@@ -139,7 +139,7 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
             }
             catch(Exception ex) 
             {
-                return BadRequest("Erro ao carregar a imagem: " + ex.Message);
+                return BadRequest("Erro ao criar listing: " + ex.Message);
             }
         }
 

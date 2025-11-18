@@ -1,4 +1,5 @@
-﻿using Assembly.Projecto.Final.Services.Dtos.GetDtos;
+﻿using Assembly.Projecto.Final.Domain.Common;
+using Assembly.Projecto.Final.Services.Dtos.GetDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.EmployeeUserDtos;
 using Assembly.Projecto.Final.Services.Dtos.IServiceDtos.OtherModelsDtos;
 using Assembly.Projecto.Final.Services.Interfaces;
@@ -6,6 +7,7 @@ using Assembly.Projecto.Final.Services.Pagination;
 using Assembly.Projecto.Final.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection.Metadata.Ecma335;
 
 namespace Assembly.Projecto.Final.WebAPI.Controllers
@@ -13,9 +15,11 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
     public class AgentController : BaseController
     {
         private readonly IAgentService _agentService;
-        public AgentController(IAgentService agentService)
+        private readonly IWebHostEnvironment _env;
+        public AgentController(IAgentService agentService, IWebHostEnvironment env)
         {
             _agentService = agentService;
+            _env = env;
         }
 
         [Authorize(Roles = "Staff,Manager,Broker,Admin")]
@@ -83,11 +87,64 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
         [Authorize(Roles = "Manager,Broker,Admin")]
         [HttpPost]
-        public ActionResult<AgentDto> Add([FromBody] CreateAgentDto createAgentDto)
+        public async Task<ActionResult<AgentDto>> Add([FromForm] AgentControllerDto agentControllerDto)
         {
-            var agentDto = _agentService.Add(createAgentDto);
+            if(agentControllerDto.PhotoFileName == null)
+            {
+                return BadRequest("A foto do agente é obrigatória.");
+            }
 
-            return Ok(agentDto);
+            try
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images/agents");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var originalName = Path.GetFileNameWithoutExtension(agentControllerDto.PhotoFileName.FileName);
+
+                var extension = Path.GetExtension(agentControllerDto.PhotoFileName.FileName);
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{originalName}{extension}";
+
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await agentControllerDto.PhotoFileName.CopyToAsync(fileStream);
+                }
+
+                CreateAgentDto createAgentDto = new CreateAgentDto
+                {
+                    Name = new NameDto
+                    {
+                        FirstName = agentControllerDto.Name.FirstName,
+                        MiddleNames = agentControllerDto.Name.MiddleNames,
+                        LastName = agentControllerDto.Name.LastName
+                    },
+                    DateOfBirth = agentControllerDto.DateOfBirth,
+                    Gender = agentControllerDto.Gender,
+                    PhotoFileName = $"images/agents/{uniqueFileName}",
+                    IsActive = agentControllerDto.IsActive,
+                    HiredDate = agentControllerDto.HiredDate,
+                    DateOfTermination = agentControllerDto.DateOfTermination,
+                    Role = agentControllerDto.Role,
+                    SupervisorId = agentControllerDto.SupervisorId,
+
+                };
+
+                var agentDto = _agentService.Add(createAgentDto);
+
+                return Ok(agentDto);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Erro ao criar agente: " + ex.Message);
+            }
+           
         }
 
 
@@ -120,16 +177,85 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
         [Authorize(Roles = "Agent,Manager,Broker,Admin")]
         [HttpPut("{id:int}")]
-        public ActionResult<AgentDto> Update([FromRoute] int id, [FromBody] AgentDto agentDto)
+        public async Task<ActionResult<AgentDto>> Update([FromRoute] int id, [FromForm] AgentControllerDto agentControllerDto)
         {
-            if (id != agentDto.Id)
+        
+            try
             {
-                return BadRequest("Os ids do agent não coincidem.");
+                var agent = _agentService.GetById(id);
+
+                if (agent == null)
+                {
+                    return NotFound("= agente não foi encontrado.");
+                }
+
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images/agents");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                if (agentControllerDto.PhotoFileName != null)
+                {
+
+                    if (!string.IsNullOrEmpty(agent.PhotoFileName))
+                    {
+                        string oldPath = Path.Combine(_env.WebRootPath, agent.PhotoFileName);
+
+                        if (System.IO.File.Exists(oldPath))
+                        {
+                            System.IO.File.Delete(oldPath);
+                        }
+
+                    }
+
+                    var originalName = Path.GetFileNameWithoutExtension(agentControllerDto.PhotoFileName.FileName);
+
+                    var extension = Path.GetExtension(agentControllerDto.PhotoFileName.FileName);
+
+                    var uniqueFileName = $"{Guid.NewGuid()}_{originalName}{extension}";
+
+                    string newPath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(newPath, FileMode.Create))
+                    {
+                        await agentControllerDto.PhotoFileName.CopyToAsync(stream);
+                    }
+
+                    agent.PhotoFileName = $"images/agents/{uniqueFileName}";
+                }
+
+                AgentDto agentDto = new AgentDto
+                {
+                    Id = id,
+                    Name = new NameDto
+                    {
+                        FirstName = agentControllerDto.Name.FirstName,
+                        MiddleNames = agentControllerDto.Name.MiddleNames,
+                        LastName = agentControllerDto.Name.LastName
+                    },
+                    DateOfBirth = agentControllerDto.DateOfBirth,
+                    Gender = agentControllerDto.Gender,
+                    PhotoFileName = agent.PhotoFileName,
+                    IsActive = agentControllerDto.IsActive,
+                    HiredDate = agentControllerDto.HiredDate,
+                    DateOfTermination = agentControllerDto.DateOfTermination,
+                    Role = agentControllerDto.Role,
+                    SupervisorId = agentControllerDto.SupervisorId,
+
+                };
+
+                var updatedAgentDto = _agentService.Update(agentDto);
+
+                return Ok(updatedAgentDto);
+
             }
-
-            var updatedAgentDto = _agentService.Update(agentDto);
-
-            return Ok(updatedAgentDto);
+            catch (Exception ex)
+            {
+                return BadRequest("Erro ao atualizar agente: " + ex.Message);
+            }
+            
         }
 
         [Authorize(Roles = "Manager,Broker,Admin")]
@@ -137,7 +263,32 @@ namespace Assembly.Projecto.Final.WebAPI.Controllers
 
         public ActionResult<AgentDto> Delete([FromRoute] int id)
         {
-            return Ok(_agentService.Delete(id));
+            try
+            {
+                var agent = _agentService.GetById(id);
+
+                if (agent == null)
+                {
+                    return NotFound("O agente não foi encontrado.");
+                }
+
+                if (!string.IsNullOrEmpty(agent.PhotoFileName))
+                {
+                    string imagePath = Path.Combine(_env.WebRootPath, agent.PhotoFileName);
+
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+
+                return Ok(_agentService.Delete(id));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Erro ao deletar agente: " + ex.Message);
+            }
         }
 
         [Authorize(Roles = "Agent,Manager,Broker,Admin")]
