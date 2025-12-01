@@ -100,6 +100,11 @@ namespace Assembly.Projecto.Final.Data.EntityFramework.Repositories
             return DbSet.Where(a => a.Role == RoleType.Admin).ToList();
         }
 
+        public List<Agent> GetAllSupervised(int id) 
+        { 
+            return DbSet.Where(a => a.SupervisorId == id).ToList();
+        }
+
         public List<Agent> GetAllPagination(int pageNumber, int pageSize, string search)
         {
             return DbSet
