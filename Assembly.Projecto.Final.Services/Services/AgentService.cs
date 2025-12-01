@@ -132,7 +132,7 @@ namespace Assembly.Projecto.Final.Services.Services
                              address.City == createAddressDto.City && address.Country == createAddressDto.Country &&
                              address.PostalCode == createAddressDto.PostalCode);
 
-                NotFoundException.When(exists, "Este endereço já existe.");
+                CustomApplicationException.When(exists, "Este endereço já existe.");
 
                 var address = Address.Create(createAddressDto.Street, createAddressDto.City, createAddressDto.Country,
                         createAddressDto.PostalCode);
@@ -268,7 +268,7 @@ namespace Assembly.Projecto.Final.Services.Services
                             address.City == addressDto.City && address.Country == addressDto.Country &&
                             address.PostalCode == addressDto.PostalCode);
 
-                NotFoundException.When(exists, "Este endereço já existe.");
+                CustomApplicationException.When(exists, "Este endereço já existe.");
 
                 if (address.Street != addressDto.Street || address.City != addressDto.City 
                      || address.Country != addressDto.Country || address.PostalCode != addressDto.PostalCode) 
@@ -682,6 +682,12 @@ namespace Assembly.Projecto.Final.Services.Services
                 var foundedAgent = _unitOfWork.AgentRepository.GetById(agentDto.Id);
 
                 NotFoundException.When(foundedAgent is null, $"{nameof(foundedAgent)} não foi encontrado.");
+
+                var supervisedAgents = _unitOfWork.AgentRepository.GetAllSupervised(foundedAgent.Id);
+
+                var exists = supervisedAgents.Any(a => a.Role >= agentDto.Role);
+
+                CustomApplicationException.When(exists, "Não pode definir uma role inferior ou igual aos seus subordinados.");
 
                 foundedAgent.Update(agentDto.Name.FirstName,string.Join(" ",agentDto.Name.MiddleNames),agentDto.Name.LastName,
                     agentDto.DateOfBirth,agentDto.Gender,agentDto.PhotoFileName,agentDto.IsActive,
